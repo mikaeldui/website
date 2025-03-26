@@ -3,7 +3,7 @@ title: "Installing with Docker"
 linkTitle: "Docker"
 date: 2017-01-05
 description: >
-  Using the official docker images with Docker and Docker Compose
+  Using the official docker images with Docker, Docker Compose, Podman and Podman Quadlet
 ---
 
 
@@ -41,6 +41,46 @@ $ docker run -d \
    --name navidrome \
    --restart=unless-stopped \
    --user $(id -u):$(id -g) \
+   -v /path/to/music:/music \
+   -v /path/to/data:/data \
+   -p 4533:4533 \
+   -e ND_LOGLEVEL=info \
+   deluan/navidrome:latest
+```
+
+
+### Using `podman` quadlet:
+Create a `navidrome.container` file in `/etc/containers/systemd` with the following content, and then run `systemctl daemon-reload` and `systemctl start navidrome` to start the quadlet.
+```
+[Unit]
+Description=Navidrome Container
+
+[Container]
+ContainerName=navidrome
+Image=docker.io/ndeluan/navidrome:latest
+User=1000 # should be owner of volumes
+Group=1000 # should be owner of volumes
+PublishPort=4533:4533
+Environment=ND_LOGLEVEL=info
+Volume=/path/to/data:/data
+Volume=/path/to/your/music/folder:/music:ro
+# Optional: auto update the container with: systemctl enable podman-auto-update.{service,timer}
+# AutoUpdate=registry
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
+```
+
+
+### Using `podman` command line tool:
+```shell
+$ podman run -d \
+   --name=navidrome \
+   --restart=always \
+   --user=$(id -u):$(id -g) \
    -v /path/to/music:/music \
    -v /path/to/data:/data \
    -p 4533:4533 \
