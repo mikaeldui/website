@@ -51,7 +51,7 @@ $ docker run -d \
 
 ### Using `podman` quadlet:
 Create a `navidrome.container` file in `/etc/containers/systemd` with the following content, and then run `systemctl daemon-reload` and `systemctl start navidrome` to start the quadlet.
-```
+```ini
 [Unit]
 Description=Navidrome Container
 
